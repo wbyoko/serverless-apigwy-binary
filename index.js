@@ -59,6 +59,12 @@ class ApiGwyBinaryPlugin {
                   acc[`method.response.header.${key}`] = e.http.response.headers[key]
                   return acc;
               }, {});
+              
+              if (e.http.response.template) {
+                integrationResponse.responseTemplates = {
+                  'application/json': "$input.path('$.body')"
+                };
+              }
             }
 
             integrationPromises

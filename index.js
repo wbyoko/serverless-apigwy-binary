@@ -55,18 +55,17 @@ class ApiGwyBinaryPlugin {
             if (e.http.response) {
               integrationResponse.responseParameters =
                 Object.keys(e.http.response.headers || {}).reduce((acc, key) => {
-                  console.log(key, e.http.response.headers[key]);
+                  this.serverless.cli.log(`${key}: ${e.http.response.headers[key]}`);
                   acc[`method.response.header.${key}`] = e.http.response.headers[key]
-                  return acc
+                  return acc;
               }, {});
               
               if (e.http.response.template) {
                 integrationResponse.responseTemplates =
                   Object.keys(e.http.response.template || {}).reduce((acc, key) => {
-                    console.log(key, e.http.response.template[key]);
-                    acc[`${key}`] = `"${e.http.response.template[key]}"`
-                    return acc
-                }, {});
+                    this.serverless.cli.log(`${key}: ${e.http.response.template[key]}`);
+                    return acc;
+                }, {"application/zip":"$input.path('$.body')"});
                 console.log(integrationResponse.responseTemplates);
               }
             }

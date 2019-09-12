@@ -27,7 +27,7 @@ class ApiGwyBinaryPlugin {
       region: this.options.region
     })
 
-    const integrationResponse = {
+    const integrationResponseParams = {
       statusCode: '200'
     }
 
@@ -35,23 +35,38 @@ class ApiGwyBinaryPlugin {
     .getRestApis()
     .promise()
     .then((apis) => {
-      integrationResponse.restApiId = apis.items.find(api => api.name === apiName).id
+      integrationResponseParams.restApiId = apis.items.find(api => api.name === apiName).id
 
       return apigateway
-        .getResources({ restApiId: integrationResponse.restApiId })
+        .getResources({ restApiId: integrationResponseParams.restApiId })
         .promise()
     })
     .then((resources) => {
       const integrationPromises = []
 
       Object.keys(funcs).forEach((fKey) => {
-        funcs[fKey].events.forEach((e) => {
+        funcs[fKey].events.forEach(async (e) => {
           if (e.http && e.http.contentHandling) {
-            integrationResponse.httpMethod = e.http.method.toUpperCase()
-            integrationResponse.contentHandling = e.http.contentHandling
-            integrationResponse.resourceId = resources.items.find(
+            integrationResponseParams.httpMethod = e.http.method.toUpperCase()
+            integrationResponseParams.resourceId = resources.items.find(
               r => r.path === `/${e.http.path}`).id
-
+            
+            // first, get the original integration response
+            let integrationResponse = await apigateway.getIntegrationResponse(integrationResponseParams).promise();
+            // add contentHandling:
+            integrationResponse.contentHandling = e.http.contentHandling;
+            // copy params required for putting response back:
+            Object.assign(integrationResponse,integrationResponseParams);
+            // write back the modified integration response to AWS:
+            // => replace nulls with empty strings
+            Object.keys(integrationResponse.responseTemplates).forEach((contentType)=>{
+                if (integrationResponse.responseTemplates[contentType] == null) {
+                    integrationResponse.responseTemplates[contentType] = "";
+                }
+            });
+            // write back the modified integration response to AWS:
+  
+            let integrationResponse = await apigateway.getIntegrationResponse(integrationResponseParams).promise();
             integrationPromises
             .push(apigateway.putIntegrationResponse(integrationResponse).promise())
           }
@@ -70,7 +85,7 @@ class ApiGwyBinaryPlugin {
       this.serverless.cli.log('Deploying content handling updates to AWS API Gateway...')
       return apigateway.createDeployment({
         stageName: this.options.stage,
-        restApiId: integrationResponse.restApiId
+        restApiId: integrationResponseParams.restApiId
       }).promise()
     })
     .then((result) => {

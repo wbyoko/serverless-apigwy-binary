@@ -61,12 +61,10 @@ class ApiGwyBinaryPlugin {
               }, {});
               
               if (e.http.response.template) {
-                integrationResponse.responseTemplates =
-                  Object.keys(e.http.response.template || {}).reduce((acc, key) => {
-                    this.serverless.cli.log(`${key}: ${e.http.response.template[key]}`);
-                    return acc;
-                }, {"application/zip":"$input.path('$.body')"});
-                console.log(integrationResponse.responseTemplates);
+                integrationResponse.responseTemplates = {
+                  'application/zip' : '$input.path(\'$.body\')'
+                };
+                this.serverless.cli.log(JSON.stringify(integrationResponse.responseTemplates));
               }
             }
 

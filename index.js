@@ -55,6 +55,7 @@ class ApiGwyBinaryPlugin {
             if (e.http.response) {
               integrationResponse.responseParameters =
                 Object.keys(e.http.response.headers || {}).reduce((acc, key) => {
+                  console.log(key, e.http.response.headers[key]);
                   acc[`method.response.header.${key}`] = e.http.response.headers[key]
                   return acc
               }, {});
@@ -62,7 +63,8 @@ class ApiGwyBinaryPlugin {
               if (e.http.response.template) {
                 integrationResponse.responseTemplates =
                   Object.keys(e.http.response.template || {}).reduce((acc, key) => {
-                    acc[`${key}`] = e.http.response.template[key]
+                    console.log(key, e.http.response.template[key]);
+                    acc[`${key}`] = `"${e.http.response.template[key]}"`
                     return acc
                 }, {});
               }

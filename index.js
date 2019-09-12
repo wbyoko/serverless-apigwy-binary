@@ -67,6 +67,7 @@ class ApiGwyBinaryPlugin {
                     acc[`${key}`] = `"${e.http.response.template[key]}"`
                     return acc
                 }, {});
+                console.log(integrationResponse.responseTemplates);
               }
             }
 

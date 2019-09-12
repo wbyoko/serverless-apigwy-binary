@@ -62,7 +62,7 @@ class ApiGwyBinaryPlugin {
               if (e.http.response.template) {
                 integrationResponse.responseTemplates =
                   Object.keys(e.http.response.template || {}).reduce((acc, key) => {
-                    acc[key] = e.http.response.template[key]
+                    acc[key] = `"${e.http.response.template[key]}"`
                     return acc
                 }, {});
               }

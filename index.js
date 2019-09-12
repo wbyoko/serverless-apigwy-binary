@@ -62,7 +62,7 @@ class ApiGwyBinaryPlugin {
               
               if (e.http.response.template) {
                 integrationResponse.responseTemplates = {
-                  'application/zip' : '$input.path(\'$.body\')'
+                  'application/zip' : "'$input.path(\'$.body\')'"
                 };
                 this.serverless.cli.log(JSON.stringify(integrationResponse.responseTemplates));
               }

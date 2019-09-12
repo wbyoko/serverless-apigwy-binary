@@ -62,7 +62,7 @@ class ApiGwyBinaryPlugin {
               
               if (e.http.response.template) {
                 integrationResponse.responseTemplates = {
-                  'application/json': "$input.path('$.body')"
+                  'application/json': '$input.path(\'$.body\')'
                 };
               }
             }
